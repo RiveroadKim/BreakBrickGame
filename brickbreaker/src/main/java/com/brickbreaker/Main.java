@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -24,32 +23,34 @@ public class Main extends Application {
     private boolean moveLeft = false;
     private boolean moveRight = false;
     private boolean gameFinished = false;
-    private static int frameCount = 0;
 
     @Override
     public void start(Stage primaryStage) {
         // Canvas 생성
-        Canvas canvas = new Canvas(850, 600);
+        Canvas canvas = new Canvas(800, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        // 점수 및 프레임 표시 라벨
-        Label framelabel = new Label("Frame: " + frameCount);
-        framelabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
 
         // Shape 객체 리스트 생성
         List<Shape> shapes = new ArrayList<>();
         // Ball 생성
-        shapes.add(new Ball(400, 300, 10, 3, 3, Color.RED));
+        shapes.add(new Ball(100, canvas.getHeight() / 2, 10, 2, 2, Color.RED));
         // Paddle 생성
-        shapes.add(new Paddle(400, 500, 100, 20, 5, Color.BLUE));
+        shapes.add(new Paddle(canvas.getWidth() / 2, canvas.getHeight() - 100, 100, 20, 5, Color.BLUE));
+        // Wall 생성
+        double wallWidth = 10;
+        double wallHeight = 10;
+        shapes.add(new Wall(0, 0, wallWidth, canvas.getHeight(), Color.BLUE));
+        shapes.add(new Wall(canvas.getWidth() - wallWidth, 0, wallWidth, canvas.getHeight(), Color.BLUE));
+        shapes.add(new Wall(wallWidth, 0, canvas.getWidth() - wallWidth * 2, wallHeight, Color.BLUE));
+        shapes.add(new Wall(wallWidth, canvas.getHeight() - wallHeight, canvas.getWidth() - wallWidth * 2, wallHeight, Color.RED));
         // 벽돌 생성
         int rows = 5;
-        int cols = 10;
+        int cols = 8;
         double brickWidth = 70;
         double brickHeight = 20;
         double padding = 5;
-        double startX = 50;
-        double startY = 50;
+        double startX = 100;
+        double startY = 100;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -72,27 +73,64 @@ public class Main extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // 프레임 체크
-                frameCount++;
-
                 // Drawable한 객체 draw
                 for(Shape shape : shapes) {
+                    // Drawable
                     if(shape instanceof Drawable) {
                         Drawable drawable = (Drawable) shape;
                         drawable.draw(gc);
                     }
-                    if(Brick.isDestroyed() == true) {
-                        shapes.remove(shape);
+                    // Movable
+                    if(shape instanceof Movable) {
+                        Movable movable = (Movable) shape;
+                        // Ball
+                        if(shape instanceof Bounceable) {
+                            Bounceable bounceable = (Bounceable) shape;
+                            movable.move();
+                            for(Shape checkShape : shapes) {
+                                if(checkShape == shape) {
+                                    continue;
+                                }
+                                bounceable.bounce(checkShape);
+                            }
+                            if(shape.getY() > canvas.getHeight()) {
+                                gameFinished = true;
+                                showGameOverPopup();
+                            }
+                        }
+                        // Paddle
+                        else{
+                            if(moveLeft == true) {
+                                movable.setDx(-movable.getDx());
+                                movable.move();
+                                movable.setDx(-movable.getDx());
+                            }
+                            if(moveRight == true) {
+                                movable.setDx(movable.getDx());
+                                movable.move();
+                            }
+                        }
                     }
+                    // Brick
+                    if(shape instanceof Breakable) {
+                        Breakable breakable = (Breakable) shape;
+                        
+                        boolean isDestroyed = false;
+                        if(breakable.checkCollision(shapes.get(0))) {
+                            isDestroyed = true;
+                        }
+                        if(isDestroyed) {
+                            shapes.remove(shape);
+                        }
+                    }         
                 }
-                
             }
         };
         gameLoop.start();
 
         // 레이아웃 설정
         StackPane root = new StackPane();
-        root.getChildren().addAll(canvas, framelabel);
+        root.getChildren().add(canvas);
 
         Scene scene = new Scene(root, 800, 600);
         scene.setOnKeyPressed(event -> {

@@ -8,5 +8,5 @@ interface Movable {
     void setDy(double dy);
     void pause();
     void resume();
-    boolean isCollisionDetected(Shape other);
+    
 }

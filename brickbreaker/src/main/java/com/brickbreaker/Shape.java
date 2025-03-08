@@ -44,7 +44,7 @@ class Circle extends Shape {
     }
     @Override
     public double getMinY() {
-        return getY() + radius;
+        return getY() - radius;
     }
     @Override
     public double getMaxX() {
@@ -52,7 +52,7 @@ class Circle extends Shape {
     }
     @Override
     public double getMaxY() {
-        return getY() - radius;
+        return getY() + radius;
     }
 }
 
@@ -85,7 +85,7 @@ class Rectangle extends Shape {
     }
     @Override
     public double getMinY() {
-        return getY() + height / 2;
+        return getY() - height / 2;
     }
     @Override
     public double getMaxX() {
@@ -93,6 +93,6 @@ class Rectangle extends Shape {
     }
     @Override
     public double getMaxY() {
-        return getY() - height / 2;
+        return getY() + height / 2;
     }
 }

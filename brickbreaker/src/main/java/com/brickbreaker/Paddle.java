@@ -52,26 +52,6 @@ public class Paddle extends Rectangle implements Drawable, Movable {
         setDx(tempdx);
         setDy(tempdy);
     }
-    @Override
-    public boolean isCollisionDetected(Shape other) {
-        double otherMaxX= other.getMaxX();
-        double otherMaxY = other.getMaxY();
-        double otherMinX = other.getMinX();
-        double otherMinY = other.getMinY();
-
-        // 공이 벽돌의 경계와 충돌했는지 확인
-        boolean collision =
-            otherMaxX > getX() - getWidth() / 2 &&
-            otherMinX < getX() + getWidth() / 2 &&
-            otherMaxY > getY() - getHeight() / 2 &&
-            otherMinY < getY() + getHeight() / 2;
-
-        if(collision) {
-            setX(otherMaxX - getWidth() / 2);
-            setY(otherMaxY - getHeight() / 2);
-        }
-        return collision;
-    }
 
     // Getter, Setter
     @Override

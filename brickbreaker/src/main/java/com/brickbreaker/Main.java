@@ -33,12 +33,12 @@ public class Main extends Application {
         // Shape 객체 리스트 생성
         List<Shape> shapes = new ArrayList<>();
         // Ball 생성
-        shapes.add(new Ball(100, canvas.getHeight() / 2, 10, 2, 2, Color.RED));
+        shapes.add(new Ball(canvas.getWidth() / 2, canvas.getHeight() / 2, 10, 1, 1, Color.RED));
         // Paddle 생성
         shapes.add(new Paddle(canvas.getWidth() / 2, canvas.getHeight() - 100, 100, 20, 5, Color.BLUE));
         // Wall 생성
-        double wallWidth = 10;
-        double wallHeight = 10;
+        double wallWidth = 20;
+        double wallHeight = 20;
         shapes.add(new Wall(0, 0, wallWidth, canvas.getHeight(), Color.BLUE));
         shapes.add(new Wall(canvas.getWidth() - wallWidth, 0, wallWidth, canvas.getHeight(), Color.BLUE));
         shapes.add(new Wall(wallWidth, 0, canvas.getWidth() - wallWidth * 2, wallHeight, Color.BLUE));
@@ -93,6 +93,7 @@ public class Main extends Application {
                                 }
                                 bounceable.bounce(checkShape);
                             }
+                            
                             if(shape.getY() > canvas.getHeight()) {
                                 gameFinished = true;
                                 showGameOverPopup();

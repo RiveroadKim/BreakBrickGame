@@ -30,7 +30,7 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
         double updateX = getX() + getDx();
         setX(updateX); // x축 위치 업데이트
         double updateY = getY() + getDy();
-        setX(updateY); // y축 위치 업데이트
+        setY(updateY); // y축 위치 업데이트
     }
 
     // 이동 메서드
@@ -52,44 +52,37 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
         setDy(tempdy);
     }
 
-    // 튕기는 메서드
     public void bounce(Shape other) {
-        if(checkCollision(other)) {
-            boolean hitLeft = getX() - getRadius() < other.getMinX() && getX() + getRadius() > other.getMinX();
-            boolean hitRight = getX() + getRadius() > other.getMaxX() && getX() - getRadius() < other.getMaxX();
-            boolean hitTop = getY() - getRadius() < other.getMinY() && getY() + getRadius() > other.getMinY();
-            boolean hitBottom = getY() + getRadius() > other.getMaxY() && getY() - getRadius() < other.getMaxY();
-
-            System.out.println("Collision detected!");
-            System.out.println("hitLeft: " + hitLeft + ", hitRight: " + hitRight + ", hitTop: " + hitTop + ", hitBottom: " + hitBottom);
-
-
-            // 모서리 충돌
-            if ((hitLeft || hitRight) && (hitTop || hitBottom)) {
-                setDx(-getDx());
-                setDy(-getDy());
+        if (checkCollision(other)) {
+            if((getX() + getRadius() <= other.getMinX() || getX() - getRadius() >= other.getMaxX())){
+                if(getY() <= other.getMaxY() - getRadius() && getY() >= other.getMinY() + getRadius()) {
+                    setDx(-dx);
+                }
+                else {
+                    setDx(-dx);
+                    setDy(-dy);
+                }
             }
-            // 수직 충돌
-            else if (hitTop || hitBottom) {
-                setDy(-getDy());
-            }
-            // 수평 충돌
-            else if (hitLeft || hitRight) {
-                setDx(-getDx());
+            else {
+                if(getX() <= other.getMaxX() - getRadius() && getX() >= other.getMinX() + getRadius()) {
+                    setDy(-dy);
+                }
+                else {
+                    setDx(-dx);
+                    setDy(-dy);
+                }
             }
         }
     }
-    // 충돌 감지 메서드
-    @Override
-    public boolean checkCollision(Shape other) {
-        // 공이 벽돌의 경계와 충돌했는지 확인
-        boolean collision =
-            other.getMaxX() >= getX() - getRadius() &&
-            other.getMinX() <= getX() + getRadius() &&
-            other.getMaxY() >= getY() - getRadius() &&
-            other.getMinY() <= getY() + getRadius();
-        return collision;
-    }
+
+// 충돌 감지 메서드
+@Override
+public boolean checkCollision(Shape other) {
+    return (this.getX() + this.getRadius() >= other.getMinX() &&
+            this.getX() - this.getRadius() <= other.getMaxX() &&
+            this.getY() + this.getRadius() >= other.getMinY() &&
+            this.getY() - this.getRadius() <= other.getMaxY());
+}
 
     // Getter와 Setter (필요 시 사용)
     public double getDx() {
